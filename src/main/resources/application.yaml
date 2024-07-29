@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: cep-service
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS:PASSWORD:12345!}
+  cache:
+    type: redis
+    cache-names: cep
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health
+  health:
+    circuitbreakers:
+      enabled: true
+resilience4j:
+  circuitbreaker:
+    instances:
+        cep:
+          slidingWindowType: COUNT_BASED
+          registerHealthIndicator: true
+          failureRateThreshold: 50
+          minimumNumberOfCalls: 1
+          automaticTransitionFromOpenToHalfOpenEnabled: true
+          waitDurationInOpenState: 60s
+          permittedNumberOfCallsInHalfOpenState: 3
+
+
+
