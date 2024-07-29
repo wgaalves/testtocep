@@ -1,4 +1,4 @@
-# To Do
+# CepService
 
 ### What you need to Run ?
 - docker-compose
@@ -18,6 +18,3 @@
 ```
     docker-compose down
 ```
-### * circuit breaker com fallback para o banco
-### * tratamento de exceptions
-### * readme
