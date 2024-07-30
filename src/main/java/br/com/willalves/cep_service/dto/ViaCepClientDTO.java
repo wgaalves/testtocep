@@ -1,38 +1,40 @@
 package br.com.willalves.cep_service.dto;
 
+import br.com.willalves.cep_service.domain.Cep;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-
+import lombok.*;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-@Data
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ViaCepClientDTO {
 
-    @JsonProperty("cep")
-    private String code;
+  @JsonProperty("cep")
+  private String code;
 
-    @JsonProperty("logradouro")
-    private String street;
+  @JsonProperty("logradouro")
+  private String street;
 
-    @JsonProperty("bairro")
-    private String neighborhood;
+  @JsonProperty("bairro")
+  private String neighborhood;
 
-    @JsonProperty("localidade")
-    private String city;
+  @JsonProperty("localidade")
+  private String city;
 
-    @JsonProperty("uf")
-    private String state;
+  @JsonProperty("uf")
+  private String state;
 
-    @JsonProperty("ibge")
-    private String ibge;
-
-    @JsonProperty("gia")
-    private String gia;
-
-    @JsonProperty("ddd")
-    private String ddd;
-
-    @JsonProperty("siafi")
-    private String siafi;
+  public Cep toDomain() {
+    return Cep.builder()
+        .code(this.code)
+        .street(this.street)
+        .neighborhood(this.neighborhood)
+        .city(this.city)
+        .state(this.state)
+        .build();
+  }
 }

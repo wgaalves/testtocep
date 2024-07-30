@@ -3,6 +3,7 @@ package br.com.willalves.cep_service.service;
 import br.com.willalves.cep_service.client.ViacepClient;
 import br.com.willalves.cep_service.domain.Cep;
 import br.com.willalves.cep_service.dto.ViaCepClientDTO;
+import br.com.willalves.cep_service.exception.exceptionhandler.CepNotFoundFound;
 import br.com.willalves.cep_service.repository.CepDao;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +11,6 @@ import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-
 
 @Log
 @Service
@@ -22,20 +22,25 @@ public class CepService {
   private final CepDao dao;
 
 
-  @CircuitBreaker(name = "cep", fallbackMethod = "fallback")
-  public ViaCepClientDTO getCepFromClient(String cep) {
-    return viaCepClient.getCep(cep);
+  @CircuitBreaker(name = "circuitViacep", fallbackMethod = "viaCepCallback")
+  public Cep getCepFromClient(String cep) {
+    return viaCepClient.getCep(cep).toDomain();
   }
 
-  public ViaCepClientDTO fallback(String cep, Exception e) {
-    return parseDomainToDto(getCepOnDB(cep.substring(0, 5)+ "-" + cep.substring(5, 8)));
+  public Cep viaCepCallback(String cep, Exception e){
+    log.info(e.getMessage());
+    log.info(e.getCause().toString());
+    return getCepOnDB(cep.substring(0, 5) + "-" + cep.substring(5, 8));
   }
 
   @Cacheable(value = "itemCache", sync = true)
-  public ViaCepClientDTO getCep(String cep) {
-    ViaCepClientDTO response = getCepFromClient(cep);
-    persistOrUpdate(response);
-    return response;
+  public Cep createCep(Cep cep) {
+
+    if (cep == null || cep.getCode() == null) {
+      throw new CepNotFoundFound("Cep Não Encontrado");
+    }
+    persistOrUpdate(cep);
+    return cep;
   }
 
   public void create(Cep cep) {
@@ -50,23 +55,14 @@ public class CepService {
     return dao.find(cep);
   }
 
-  private void persistOrUpdate(ViaCepClientDTO cep) {
+  private void persistOrUpdate(Cep cep) {
 
     Cep query = getCepOnDB(cep.getCode());
     if (query == null) {
-      create(parseDtotoDomain(cep));
-    } else if (!query.equals(parseDtotoDomain(cep))) {
-      update(parseDtotoDomain(cep));
+      create(cep);
+    } else if (!query.equals(cep)) {
+      update(cep);
     }
-  }
-
-  private Cep parseDtotoDomain(ViaCepClientDTO cep) {
-    ModelMapper modelMapper = new ModelMapper();
-    return modelMapper.map(cep, Cep.class);
-  }
-  private ViaCepClientDTO parseDomainToDto(Cep cep) {
-    ModelMapper modelMapper = new ModelMapper();
-    return modelMapper.map(cep, ViaCepClientDTO.class);
   }
 
 }

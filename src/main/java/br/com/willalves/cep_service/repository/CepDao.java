@@ -25,10 +25,6 @@ public class CepDao {
             cep.setNeighborhood(rs.getString("neighborhood"));
             cep.setCity(rs.getString("city"));
             cep.setState(rs.getString("state"));
-            cep.setDdd(rs.getString("ddd"));
-            cep.setGia(rs.getString("gia"));
-            cep.setIbge(rs.getString("ibge"));
-            cep.setSiafi(rs.getString("siafi"));
 
             return cep;
         }else {
@@ -39,31 +35,23 @@ public class CepDao {
   }
 
   public boolean create(Cep cep) {
-    String SQL_INSERT_CEP = "insert into cep(code, street, neighborhood, city, state, ibge, gia, ddd, siafi) values(?,?,?,?,?,?,?,?,?)";
+    String SQL_INSERT_CEP = "insert into cep(code, street, neighborhood, city, state) values(?,?,?,?,?)";
     return jdbcTemplate.update(SQL_INSERT_CEP,
                                 cep.getCode(),
                                 cep.getStreet(),
                                 cep.getNeighborhood(),
                                 cep.getCity(),
-                                cep.getState(),
-                                cep.getIbge(),
-                                cep.getGia(),
-                                cep.getDdd(),
-                                cep.getSiafi()) > 0;
+                                cep.getState()) > 0;
   }
 
   public boolean update(Cep cep){
-      String SQL_UPDATE_CEP = "update cep set street = ?, neighborhood = ?, city = ?, state = ?, ibge = ?, gia = ?, ddd = ?, siafi= ? where code = ?";
+      String SQL_UPDATE_CEP = "update cep set street = ?, neighborhood = ?, city = ?, state = ? where code = ?";
 
       return jdbcTemplate.update(SQL_UPDATE_CEP,
               cep.getStreet(),
               cep.getNeighborhood(),
               cep.getCity(),
               cep.getState(),
-              cep.getIbge(),
-              cep.getGia(),
-              cep.getDdd(),
-              cep.getSiafi(),
               cep.getCode()) > 0;
   }
 }

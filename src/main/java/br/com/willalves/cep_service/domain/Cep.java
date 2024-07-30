@@ -1,8 +1,13 @@
 package br.com.willalves.cep_service.domain;
 
-import lombok.Data;
+import br.com.willalves.cep_service.dto.ViaCepClientDTO;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Cep {
 
   private String code;
@@ -10,9 +15,17 @@ public class Cep {
   private String neighborhood;
   private String city;
   private String state;
-  private String ibge;
-  private String gia;
-  private String ddd;
-  private String siafi;
+
+
+
+  public ViaCepClientDTO toDTO(){
+    return ViaCepClientDTO.builder()
+            .code(this.code)
+            .street(this.street)
+            .neighborhood(this.neighborhood)
+            .city(this.city)
+            .state(this.state)
+            .build();
+  }
 
 }
