@@ -1,34 +1,25 @@
 package br.com.willalves.cep_service.repository;
 
 import br.com.willalves.cep_service.domain.Cep;
-import lombok.AllArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
-
-@Log
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Component
 public class CepDao {
 
-  JdbcTemplate jdbcTemplate;
-  NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+  @Qualifier("WriteTemplate")
+  @NonNull
+  private final JdbcTemplate jdbcTemplate;
 
-  @Bean
-  public JdbcTemplate readTempĺate(@Qualifier("writeDataSource") DataSource dataSource) {
-    return new JdbcTemplate(dataSource);
-  }
-
-  @Bean
-  public JdbcTemplate WriteTemplate(@Qualifier("readDataSource") DataSource dataSource) {
-    return new JdbcTemplate(dataSource);
-  }
+  @Qualifier("readTemplate")
+  @NonNull
+  private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
   public Cep find(String code) {
     String SQL_RETRIEVE_CEP = "select * from cep where code = :code";
@@ -37,13 +28,20 @@ public class CepDao {
         SQL_RETRIEVE_CEP,
         new MapSqlParameterSource("code", code),
         resultSet -> {
-          return Cep.builder()
-              .code(resultSet.getString("code"))
-              .city(resultSet.getString("city"))
-              .street(resultSet.getString("street"))
-              .neighborhood("neighborhood")
-              .state("state")
-              .build();
+          if (resultSet.next()) {
+            Cep cep = new Cep();
+            return Cep.builder()
+                .code(resultSet.getString("code"))
+                .city(resultSet.getString("city"))
+                .street(resultSet.getString("street"))
+                .neighborhood("neighborhood")
+                .state("state")
+                .build();
+
+          } else {
+            System.out.println("nulo");
+            return null;
+          }
         });
   }
   ;

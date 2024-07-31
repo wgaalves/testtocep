@@ -17,24 +17,76 @@ services:
     container_name: redis
     ports:
       - 6379:6379
-  postgres:
-    image: postgres:15.3-alpine
-    container_name: postgressql
+ # postgres:
+ #   image: postgres:15.3-alpine
+ #   container_name: postgressql
+ #   restart: always
+ #   environment:
+ #     POSTGRES_PASSWORD: postgres
+ #     POSTGRES_USER: postgres
+ #   ports:
+ #     - 5432:5432
+ #   volumes:
+ #     - ./db_start.sql:/docker-entrypoint-initdb.d/db_start.sql
+  postgres_primary:
+    image: postgres:14-alpine
+    user: postgres
     restart: always
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
+    container_name: postgres_primary
+    healthcheck:
+      test: 'pg_isready -U user --dbname=cepdb'
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
       - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST_AUTH_METHOD: "scram-sha-256\nhost replication all 0.0.0.0/0 md5"
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
+    command: |
+      postgres 
+      -c wal_level=replica 
+      -c hot_standby=on 
+      -c max_wal_senders=10 
+      -c max_replication_slots=10 
+      -c hot_standby_feedback=on
     volumes:
       - ./db_start.sql:/docker-entrypoint-initdb.d/db_start.sql
 
+  postgres_replica:
+    image: postgres:14-alpine
+    user: postgres
+    container_name: postgres_replica
+    restart: always
+    healthcheck:
+      test: 'pg_isready -U postgres --dbname=cepdb'
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - 5433:5432
+    environment:
+      PGUSER: replicator
+      PGPASSWORD: replicator_password
+    command: |
+      bash -c "
+      until pg_basebackup --pgdata=/var/lib/postgresql/data -R --slot=replication_slot --host=postgres_primary --port=5432
+      do
+      echo 'Waiting for primary to connect...'
+      sleep 1s
+      done
+      echo 'Backup done, starting replica...'
+      chmod 0700 /var/lib/postgresql/data
+      postgres
+      "
+    depends_on:
+      - postgres_primary
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: pgadmin
     restart: always
-    depends_on:
-      - postgres
     environment:
       PGADMIN_DEFAULT_EMAIL: user@localhost.com
       PGADMIN_DEFAULT_PASSWORD: password

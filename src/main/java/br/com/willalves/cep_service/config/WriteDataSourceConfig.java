@@ -7,6 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.sql.DataSource;
 
@@ -15,15 +16,20 @@ public class WriteDataSourceConfig {
 
     @Bean
     @ConfigurationProperties("spring.datasource.write")
-    public DataSourceProperties dataSourceProperties() {
+    public DataSourceProperties dataSourcePropertiesWrite() {
         return new DataSourceProperties();
     }
 
     @Bean
     public DataSource writeDataSource() {
-        return dataSourceProperties()
+        return dataSourcePropertiesWrite()
                 .initializeDataSourceBuilder()
                 .build();
+    }
+
+    @Bean
+    public JdbcTemplate WriteTemplate(@Qualifier("readDataSource") DataSource dataSource) {
+        return new JdbcTemplate(dataSource);
     }
 
 }

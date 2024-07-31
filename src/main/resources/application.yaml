@@ -36,12 +36,12 @@ spring:
 
   datasource:
     read:
-      url: ${DB_READ_URL}
-      username: ${DB_READ_USERNAME}
-      password: ${DB_READ_PASSWORD}
+      url: ${DB_URL_READ}
+      username: ${DB_USERNAME}
+      password: ${DB_PASSWORD}
       driverClassName: "org.postgresql.Driver"
     write:
-      url: ${DB_WRITES_URL}
-      username: ${DB_WRITES_USERNAME}
-      password: ${DB_WRITES_PASSWORD}
+      url: ${DB_URL_WRITE}
+      username: ${DB_USERNAME}
+      password: ${DB_PASSWORD}
       driverClassName: "org.postgresql.Driver"
