@@ -3,6 +3,7 @@ plugins {
 	id 'org.springframework.boot' version '3.1.6'
 	id 'io.spring.dependency-management' version '1.1.6'
 	id 'org.asciidoctor.jvm.convert' version '3.3.2'
+	id 'jacoco'
 }
 
 group = 'br.com.willalves'
@@ -40,6 +41,9 @@ dependencies {
 
 	implementation 'org.modelmapper:modelmapper:2.4.2'
 
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
@@ -64,3 +68,28 @@ tasks.named('asciidoctor') {
 	inputs.dir snippetsDir
 	dependsOn test
 }
+
+
+test {
+	jacoco {
+		excludes += ['br/com/willalves/cep_service/dto/*',
+					 'br/com/willalves/cep_service/enumerator',
+					 'br/com/willalves/cep_service/client/*',
+					 'br/com/willalves/cep_service/domain/*',
+					 'br/com/willalves/cep_service/repository/*',
+					 'br/com/willalves/cep_service/CepServiceApplication.java']
+	}
+	finalizedBy jacocoTestReport // report is always generated after tests run
+}
+
+jacocoTestReport {
+	reports {
+		xml.required = false
+		csv.required = false
+		html.required = true
+	}
+
+
+}
+
+

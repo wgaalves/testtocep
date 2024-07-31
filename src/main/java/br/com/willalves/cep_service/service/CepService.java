@@ -2,13 +2,11 @@ package br.com.willalves.cep_service.service;
 
 import br.com.willalves.cep_service.client.ViacepClient;
 import br.com.willalves.cep_service.domain.Cep;
-import br.com.willalves.cep_service.dto.ViaCepClientDTO;
-import br.com.willalves.cep_service.exception.exceptionhandler.CepNotFoundFound;
+import br.com.willalves.cep_service.exception.CepNotFoundFound;
 import br.com.willalves.cep_service.repository.CepDao;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -28,8 +26,6 @@ public class CepService {
   }
 
   public Cep viaCepCallback(String cep, Exception e){
-    log.info(e.getMessage());
-    log.info(e.getCause().toString());
     return getCepOnDB(cep.substring(0, 5) + "-" + cep.substring(5, 8));
   }
 
@@ -55,7 +51,7 @@ public class CepService {
     return dao.find(cep);
   }
 
-  private void persistOrUpdate(Cep cep) {
+  void persistOrUpdate(Cep cep) {
 
     Cep query = getCepOnDB(cep.getCode());
     if (query == null) {

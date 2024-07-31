@@ -1,7 +1,6 @@
-package br.com.willalves.cep_service.exception.exceptionhandler;
+package br.com.willalves.cep_service.exception;
 
 
-import feign.FeignException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
