@@ -155,11 +155,11 @@ class CepServiceTest {
     void testCreateCepWithDifferentExistingCep() {
         Cep cep = createCep();
         Cep existingCep = Cep.builder()
-                .city("Another City")
-                .code("13568880")
+                .city("sao carlos")
+                .code("13568000")
                 .state("SP")
-                .neighborhood("Different Neighborhood")
-                .street("Different Street")
+                .neighborhood("Di")
+                .street("2 street")
                 .build();
         when(cepDao.find("13568880")).thenReturn(existingCep);
 

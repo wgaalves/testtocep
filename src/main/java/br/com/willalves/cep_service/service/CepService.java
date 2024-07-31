@@ -29,7 +29,7 @@ public class CepService {
     return getCepOnDB(cep.substring(0, 5) + "-" + cep.substring(5, 8));
   }
 
-  @Cacheable(value = "itemCache", sync = true)
+  //@Cacheable(value = "itemCache", sync = true)
   public Cep createCep(Cep cep) {
 
     if (cep == null || cep.getCode() == null) {

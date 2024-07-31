@@ -5,6 +5,7 @@ import br.com.willalves.cep_service.domain.Cep;
 import br.com.willalves.cep_service.dto.ViaCepClientDTO;
 
 import br.com.willalves.cep_service.service.CepService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
@@ -14,12 +15,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@AllArgsConstructor
 @RequestMapping("/api")
 @RestController
 public class CepController implements CepSpecification {
 
-    @Autowired
-    private CepService cepService;
+
+    private final CepService cepService;
 
     @Cacheable(value = "itemCache", sync = true)
     @Override

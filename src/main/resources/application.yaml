@@ -1,6 +1,3 @@
-
-
-
 management:
   endpoint:
     health:
@@ -25,9 +22,6 @@ resilience4j:
         permittedNumberOfCallsInHalfOpenState: 3
 
 
-
-
-
 spring:
   application:
     name: cep-service
@@ -39,3 +33,15 @@ spring:
   cache:
     type: redis
     cache-names: cep
+
+  datasource:
+    read:
+      url: ${DB_READ_URL}
+      username: ${DB_READ_USERNAME}
+      password: ${DB_READ_PASSWORD}
+      driverClassName: "org.postgresql.Driver"
+    write:
+      url: ${DB_WRITES_URL}
+      username: ${DB_WRITES_USERNAME}
+      password: ${DB_WRITES_PASSWORD}
+      driverClassName: "org.postgresql.Driver"
